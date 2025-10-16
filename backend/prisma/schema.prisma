@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              Int       @id @default(autoincrement())
+  nomeCompleto    String
+  email           String    @unique
+  cpf             String    @unique
+  telefone        String
+  senhaHash       String
+  tipoUsuario     TipoUsuario @default(CLIENTE)
+  dataCadastro    DateTime  @default(now())
+  ultimoAcesso    DateTime?
+  ativo           Boolean   @default(true)
+
+  // Relações
+  processos       Processo[]
+  mensagensEnviadas Mensagem[] @relation("MensagemRemetente")
+  mensagensRecebidas Mensagem[] @relation("MensagemDestinatario")
+  documentos      Documento[]
+  auditLogs       AuditLog[]
+
+  @@map("usuarios")
+}
+
+model Processo {
+  id              Int       @id @default(autoincrement())
+  protocolo       String    @unique
+  tipoProcesso    TipoProcesso
+  subtipo         String?
+  usuarioId       Int
+  status          StatusProcesso @default(RASCUNHO)
+  dataCriacao     DateTime  @default(now())
+  dataEnvio       DateTime?
+  dataConclusao   DateTime?
+  prazo72hValido  Boolean   @default(false)
+  dadosJson       Json      // Dados do formulário específico
+  observacoes     String?
+
+  // Relações
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  documentos      Documento[]
+  mensagens       Mensagem[]
+  protocoloInfo   Protocolo?
+
+  @@map("processos")
+}
+
+model Documento {
+  id              Int       @id @default(autoincrement())
+  processoId      Int
+  tipoDocumento   String
+  nomeArquivo     String
+  tamanhoBytes    Int
+  urlStorage      String
+  mimeType        String
+  hashMd5         String
+  dataUpload      DateTime  @default(now())
+  uploadedById    Int
+
+  // Relações
+  processo        Processo @relation(fields: [processoId], references: [id], onDelete: Cascade)
+  uploadedBy      Usuario  @relation(fields: [uploadedById], references: [id])
+
+  @@map("documentos")
+}
+
+model Mensagem {
+  id              Int       @id @default(autoincrement())
+  processoId      Int
+  remetenteId     Int
+  destinatarioId  Int
+  mensagemTexto   String
+  dataEnvio       DateTime  @default(now())
+  lida            Boolean   @default(false)
+  dataLeitura     DateTime?
+
+  // Relações
+  processo        Processo @relation(fields: [processoId], references: [id], onDelete: Cascade)
+  remetente       Usuario  @relation("MensagemRemetente", fields: [remetenteId], references: [id])
+  destinatario    Usuario  @relation("MensagemDestinatario", fields: [destinatarioId], references: [id])
+
+  @@map("mensagens")
+}
+
+model Protocolo {
+  id              Int       @id @default(autoincrement())
+  numeroProtocolo String    @unique
+  processoId      Int
+  dataGeracao     DateTime  @default(now())
+  hashVerificacao String
+  pdfUrl          String?
+
+  // Relações
+  processo        Processo  @relation(fields: [processoId], references: [id], onDelete: Cascade)
+
+  @@map("protocolos")
+}
+
+model AuditLog {
+  id              Int       @id @default(autoincrement())
+  usuarioId       Int?
+  action          String
+  resource        String
+  resourceId      Int?
+  ipAddress       String?
+  userAgent       String?
+  timestamp       DateTime  @default(now())
+
+  // Relações
+  usuario         Usuario?  @relation(fields: [usuarioId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum TipoUsuario {
+  CLIENTE
+  CONTADOR
+  ADMIN
+}
+
+enum TipoProcesso {
+  CONSTITUICAO
+  ALTERACAO
+  BAIXA
+}
+
+enum StatusProcesso {
+  RASCUNHO
+  ENVIADO
+  EM_ANALISE
+  PENDENTE_DOC
+  CONCLUIDO
+  CANCELADO
+}
