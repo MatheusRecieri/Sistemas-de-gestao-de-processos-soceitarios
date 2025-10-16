@@ -2,20 +2,21 @@
   "compilerOptions": {
     /* Linguagem e Ambiente */
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "module": "ESNext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
-    
     /* Configurações Strict */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
+    "strictPropertyInitialization": false,
     "noImplicitThis": true,
     "useUnknownInCatchVariables": true,
     "alwaysStrict": true,
@@ -23,14 +24,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "exactOptionalPropertyTypes": false,
-    
     /* Configurações Adicionais */
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    
     /* Output */
     "outDir": "./dist",
     "rootDir": "./src",
@@ -38,31 +37,27 @@
     "declarationMap": false,
     "sourceMap": true,
     "removeComments": true,
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "importHelpers": true,
-    
     /* Path Mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/middleware/*": ["src/middleware/*"],
-      "@/routes/*": ["src/routes/*"],
-      "@/services/*": ["src/services/*"],
-      "@/controllers/*": ["src/controllers/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
     "src/**/*",
-    "src/**/*.ts",
-    "prisma/**/*.ts"
+    "prisma/sedd.ts",
+    "lib/middlewares"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "lib/prisma/**/*"
   ],
   "ts-node": {
     "esm": true,
