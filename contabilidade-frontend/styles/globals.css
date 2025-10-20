@@ -1,0 +1,13 @@
+/* app/globals.css */
+@import "tailwindcss";
+
+/* Aqui você pode colocar sua customização de temas (v4 permite configuração via CSS) */
+@theme {
+  --color-primary: #2563eb;
+  --color-secondary: #10b981;
+  --color-alert: #f59e0b;
+  --color-error: #ef4444;
+  --color-neutral-dark: #333333;
+  --color-neutral-medium: #757575;
+  --color-neutral-light: #f4f4f4;
+}
